@@ -13,6 +13,7 @@ class Client extends Model
         'name',
         'user_name',
         'user_pass',
+        'company_id',
         'token',
         'api_key'
     ];
