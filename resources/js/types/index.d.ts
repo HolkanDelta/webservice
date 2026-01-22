@@ -46,9 +46,9 @@ export interface Client {
     id: number;
     name: string;
     user_name: string;
-    user_key:string;
-    token:string;
-    api_key:string;
+    user_key: string;
+    token: string;
+    apikey: string;
 }
 export interface Service {
     id: number;

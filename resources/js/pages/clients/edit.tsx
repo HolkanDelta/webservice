@@ -4,27 +4,27 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FormEventHandler, useRef } from 'react';
-interface ClientType  {
+interface ClientType {
     id: number;
     name: string;
     user_name: string;
     user_pass: string;
-    api_key: string;
+    apikey: string;
 };
 
 
-export default function EditClient({cliente} : { cliente: ClientType[] } ) {
+export default function EditClient({ cliente }: { cliente: ClientType[] }) {
     console.log(cliente);
-    
+
     const taskEdditClient = useRef<HTMLFormElement>(null);
     const { data, setData, put, processing, errors, reset } = useForm<ClientType>({
         id: cliente.id,
         name: cliente.name,
         user_name: cliente.user_name,
         user_pass: cliente.user_pass,
-        api_key: cliente.api_key
+        apikey: cliente.apikey
     });
-    const EditClientTask : FormEventHandler = (e) => {
+    const EditClientTask: FormEventHandler = (e) => {
         e.preventDefault();
         put(route('clientes.update', data.id), {
             onSuccess: () => {
@@ -38,7 +38,7 @@ export default function EditClient({cliente} : { cliente: ClientType[] } ) {
             },
         });
     };
-    
+
     return (
         <AppLayout>
             <Head title="Clients - Edit" />
@@ -49,14 +49,14 @@ export default function EditClient({cliente} : { cliente: ClientType[] } ) {
                         Lista de Clientes
                     </Link>
                 </div>
-                <form onSubmit={ EditClientTask }  className="flex flex-col gap-4">
+                <form onSubmit={EditClientTask} className="flex flex-col gap-4">
                     <div>
                         <Label htmlFor="name">Nombre</Label>
                         <Input
                             id="name"
                             ref={taskEdditClient}
                             value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}   
+                            onChange={(e) => setData('name', e.target.value)}
                             className="mt-1 w-full"
                             required
                         />
@@ -88,16 +88,16 @@ export default function EditClient({cliente} : { cliente: ClientType[] } ) {
                         {errors.user_pass && <p className="mt-1 text-sm text-red-600">{errors.user_pass}</p>}
                     </div>
                     <div>
-                        <Label htmlFor="api_key">API Key</Label>
+                        <Label htmlFor="apikey">API Key</Label>
                         <Input
-                            id="api_key"
+                            id="apikey"
                             ref={taskEdditClient}
-                            value={data.api_key}
-                            onChange={(e) => setData('api_key', e.target.value)}
+                            value={data.apikey}
+                            onChange={(e) => setData('apikey', e.target.value)}
                             className="mt-1 w-full"
                             required
                         />
-                        {errors.api_key && <p className="mt-1 text-sm text-red-600">{errors.api_key}</p>}
+                        {errors.apikey && <p className="mt-1 text-sm text-red-600">{errors.apikey}</p>}
                     </div>
                     <Button variant={'secondary'} type='submit'>Actualizar</Button>
                 </form>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('base_url');
-            $table->boolean('recurrence')->default(true);
+            $table->string('recurrence')->default(true);
             $table->timestamps();
         });
     }

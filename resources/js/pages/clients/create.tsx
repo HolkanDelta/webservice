@@ -15,7 +15,7 @@ type CreateClient = {
 };
 
 
-export default function CreateClient({  clients }: { clients: Client[] } ) {
+export default function CreateClient({ clients }: { clients: Client[] }) {
     const taskCreateClientForm = useRef<HTMLFormElement>(null);
     const { data, setData, post, processing, errors, reset } = useForm<CreateClient>({
         name: '',
@@ -23,7 +23,7 @@ export default function CreateClient({  clients }: { clients: Client[] } ) {
         user_pass: '',
         api_key: '',
     });
-    const CreateClientTask : FormEventHandler = (e) => {
+    const CreateClientTask: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('clientes.store'), {
             onSuccess: () => {
@@ -37,7 +37,7 @@ export default function CreateClient({  clients }: { clients: Client[] } ) {
             },
         });
     };
-    
+
     return (
         <AppLayout>
             <Head title="Clients - List" />
@@ -48,14 +48,14 @@ export default function CreateClient({  clients }: { clients: Client[] } ) {
                         Lista de Clientes
                     </Link>
                 </div>
-                <form onSubmit={ CreateClientTask }  className="flex flex-col gap-4">
+                <form onSubmit={CreateClientTask} className="flex flex-col gap-4">
                     <div>
                         <Label htmlFor="name">Name</Label>
                         <Input
                             id="name"
                             ref={taskCreateClientForm}
                             value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}   
+                            onChange={(e) => setData('name', e.target.value)}
                             className="mt-1 w-full"
                             required
                         />
@@ -85,15 +85,15 @@ export default function CreateClient({  clients }: { clients: Client[] } ) {
                         {errors.user_pass && <p className="mt-1 text-sm text-red-600">{errors.user_pass}</p>}
                     </div>
                     <div>
-                        <Label htmlFor="api_key">API Key</Label>
+                        <Label htmlFor="apikey">API Key</Label>
                         <Input
-                            id="api_key"
-                            value={data.api_key}
-                            onChange={(e) => setData('api_key', e.target.value)}
+                            id="apikey"
+                            value={data.apikey}
+                            onChange={(e) => setData('apikey', e.target.value)}
                             className="mt-1 w-full"
                             required
                         />
-                        {errors.api_key && <p className="mt-1 text-sm text-red-600">{errors.api_key}</p>}
+                        {errors.apikey && <p className="mt-1 text-sm text-red-600">{errors.apikey}</p>}
                     </div>
                     <Button variant={'secondary'} type='submit'>Crear</Button>
                 </form>

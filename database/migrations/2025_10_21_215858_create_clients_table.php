@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('user_pass');
             $table->string('company_id')->nullable();
             $table->text('token')->nullable();
-            $table->string('api_key', length: 150);
+            $table->string('apikey', length: 150);
             $table->timestamps();
         });
     }
