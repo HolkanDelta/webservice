@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
+use App\Services\RecursoConfiable;
 use Inertia\Inertia;
+use Illuminate\Http\JsonResponse;
 
 class ClientController extends Controller
 {
@@ -71,4 +73,8 @@ class ClientController extends Controller
         $client->delete();
         return redirect()->route('clientes.index');
     }
+
+    
+
+
 }
