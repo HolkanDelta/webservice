@@ -30,6 +30,7 @@ class RecursoConfiableCommand extends Command
     {
         //Logística y maniobras CAVA
         $clientCAVA = Client::where('name', 'Logística y maniobras CAVA')->first();
+        //dd($clientCAVA);
         if ($clientCAVA) {
             $rcController= new RcController();
             $rcController->RCServiceUnits($gpsService, $clientCAVA);
