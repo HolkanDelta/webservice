@@ -28,37 +28,52 @@ class RcController extends Controller
     public function RCServiceUnits(RecursoConfiable $gpsService, $client): JsonResponse
     {
         $units = new sdkMapon();
+        $sdkMapon = new sdkMapon();
         $units = $units->units($client->apikey);
         $units = json_decode($units->getContent());
+        $unitsArray = [];
         $payload_data = [];
         foreach ($units->data->units as $unit) {
-            $payload_data[] = [
-                    "event" => [
-                        [
-                            'code' => 0,
-                            'asset' => $unit->number ? $unit->number : $unit->label,
-                            'serialNumber' => $unit->vin ? $unit->vin : $unit->number,
-                            'customer' => $client->company_id ? $client->company_id : NULL,
-                            'lat' => $unit->lat ? $unit->lat : 0,
-                            'lng' => $unit->lng ? $unit->lng : 0,
-                            'date' => $unit->last_update ? $unit->last_update : null,
-                            'speed' => $unit->speed ? $unit->speed : 0,
-                            'ignition' => $unit->ignition_total_time ? $unit->ignition_total_time : NULL,
-                            'battery' =>  '0',
-                            'full_address' => '0',
-                            'altitude' => '0',
-                            'course' => $unit->direction ? $unit->direction : NULL,
-                            'humidity' => '0',
-                            'odometer' => $unit->mileage ? $unit->mileage : NULL,
-                            'temperature' => '0',
-                            'vehicleType' => $unit->type ? $unit->type : NULL,
-                            'vehicleBrand' => '0',
-                            'vehicleModel' => '0',
-                            'shipment' => '0',
+            $unitsArray[] = $unit->unit_id;
+        }
+        foreach ($unitsArray as $unit_id) {            
+            $unitsind = $sdkMapon->units_id($client->apikey, $unit_id);
+            $unitsind = json_decode($unitsind->getContent());
+            foreach ($unitsind->data->units as $unit) {
+                $payload_data[] = [
+                        "event" => [
+                            [
+                                'code' => 0,
+                                'asset' => $unit->number ? $unit->number : $unit->label,
+                                'serialNumber' => $unit->device->imei ? $unit->device->imei : $unit->vin,
+                                'customer' => $client->company_id ? $client->company_id : NULL,
+                                'lat' => $unit->lat ? $unit->lat : 0,
+                                'lng' => $unit->lng ? $unit->lng : 0,
+                                'date' => $unit->last_update ? $unit->last_update : null,
+                                'speed' => $unit->speed ? $unit->speed : 0,
+                                'ignition' => $unit->ignition_total_time ? $unit->ignition_total_time : NULL,
+                                'battery' =>  '0',
+                                'full_address' => '0',
+                                'altitude' => '0',
+                                'course' => $unit->direction ? $unit->direction : NULL,
+                                'humidity' => '0',
+                                'odometer' => $unit->mileage ? $unit->mileage : NULL,
+                                'temperature' => '0',
+                                'vehicleType' => $unit->type ? $unit->type : NULL,
+                                'vehicleBrand' => '0',
+                                'vehicleModel' => '0',
+                                'shipment' => '0',
+                            ]
                         ]
-                    ]
-                ];
-        } 
+                    ];
+            } 
+        }
+        // dd($unitsArray);
+        // //$unitsArray = implode(',', $unitsArray);
+        // $units = $units->units_id($client->apikey, $unitsArray);
+        // $units = json_decode($units->getContent());
+        
+        
         $date = date('Y-m-d H:i:s');
         $filename = 'recurso_confiable_' . $date . '.log';
         $payload = json_encode($payload_data);
