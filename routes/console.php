@@ -11,3 +11,11 @@ Artisan::command('inspire', function () {
 Schedule::command('fleet-rocket_command')
     ->everyFiveMinutes()
     ->withoutOverlapping();
+
+Schedule::command('recurso-confiable_command')
+    ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command('recurso-token-change')
+    ->twiceDaily(1, 13)
+    ->withoutOverlapping();

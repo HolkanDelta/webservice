@@ -126,6 +126,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        
+        'recurso_confiable' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/recurso_confiable.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
 
     ],
 

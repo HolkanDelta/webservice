@@ -7,24 +7,32 @@ use Illuminate\Http\Request;
 use App\Services\RecursoConfiable;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\sdk\sdkMapon;
+use App\Models\Client;
+use Illuminate\Support\Facades\Log;
 
 class RcController extends Controller
 {
-    public function RCServiceLogin(RecursoConfiable $gpsService): JsonResponse
+    public function RCServiceLogin(RecursoConfiable $gpsService, $client): JsonResponse
     {
         $resultado = $gpsService->callMethod('GetUserToken', [
-                    'userId' => 'ws_avl_holkan',
-                    'password' => 'bGcU#584znHl#0',
+                    'userId' => $client->user_name,
+                    'password' => $client->user_pass,
                 ]);
-            return response()->json($resultado);
+        $token = $resultado->GetUserTokenResult->token;
+        //dd($token);
+        
+        $client->token = $token;
+        $client->save();
+        return response()->json($resultado);
     }
     public function RCServiceUnits(RecursoConfiable $gpsService, $client): JsonResponse
     {
         $units = new sdkMapon();
         $units = $units->units($client->apikey);
         $units = json_decode($units->getContent());
+        $payload_data = [];
         foreach ($units->data->units as $unit) {
-            $payload_data = [
+            $payload_data[] = [
                     "event" => [
                         [
                             'code' => 0,
@@ -50,15 +58,22 @@ class RcController extends Controller
                         ]
                     ]
                 ];
-        }        
-        
-        
+        } 
+        $date = date('Y-m-d H:i:s');
+        $filename = 'recurso_confiable_' . $date . '.log';
+        $payload = json_encode($payload_data);
         $resultado = $gpsService->callMethod('GPSAssetTracking', [
                      'token' => $client->token,
                      'events' => $payload_data,
                  ]);
-        //dd($resultado);
-         return response()->json($resultado);
+        $log_resultado = json_encode(
+            [
+                'payload' => $payload_data,
+                'resultado' => $resultado,
+            ]
+        );
+        Log::channel('recurso_confiable')->info($log_resultado);
+        return response()->json($resultado);
     }
 }
 
