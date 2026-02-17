@@ -27,15 +27,18 @@ class RcController extends Controller
     }
     public function RCServiceUnits(RecursoConfiable $gpsService, $client): JsonResponse
     {
-        $units = new sdkMapon();
+        $unitslistsdk = new sdkMapon();
         $sdkMapon = new sdkMapon();
-        $units = $units->units($client->apikey);
-        $units = json_decode($units->getContent());
+        $unitslist = $unitslistsdk->units($client->apikey);
+        $units = json_decode($unitslist->getContent());
         $unitsArray = [];
         $payload_data = [];
-        foreach ($units->data->units as $unit) {
-            $unitsArray[] = $unit->unit_id;
-        }
+        //if($units->data->units){
+            foreach ($units->data->units as $unit) {
+                $unitsArray[] = $unit->unit_id;
+            }
+        //}
+        //dd($unitsArray);
         foreach ($unitsArray as $unit_id) {            
             $unitsind = $sdkMapon->units_id($client->apikey, $unit_id);
             $unitsind = json_decode($unitsind->getContent());

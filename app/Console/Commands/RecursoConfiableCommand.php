@@ -28,26 +28,35 @@ class RecursoConfiableCommand extends Command
      */
     public function handle(RecursoConfiable $gpsService)
     {
-        //Logística y maniobras CAVA
-        $clientCAVA = Client::where('name', 'Logística y maniobras CAVA')->first();
-        //dd($clientCAVA);
-        if ($clientCAVA) {
-            $rcController= new RcController();
-            $rcController->RCServiceUnits($gpsService, $clientCAVA);
-            
-        } else {
-            $this->error('Cliente Logística y maniobras CAVA no encontrado.');
-            return;
-        }
+        // 1. Instanciamos el controlador UNA sola vez (ahorramos memoria)
+        $rcController = new RcController();
 
-        $clientHector = Client::where('name', 'Hector Manuel Orozco RecursoConfiable')->first();
-        if ($clientHector) {
-            $rcController= new RcController();
-            $rcController->RCServiceUnits($gpsService, $clientHector);
-            
-        } else {
-            $this->error('Cliente Hector Manuel Orozco RecursoConfiable no encontrado.');
-            return;
+        // 2. Definimos la lista de clientes a procesar
+        $clientNames = [
+            'Logística y maniobras CAVA',
+            'Hector Manuel Orozco RecursoConfiable'
+        ];
+
+        // 3. Iteramos sobre cada cliente
+        foreach ($clientNames as $name) {
+            $client = Client::where('name', $name)->first();
+
+            if ($client) {
+                $this->info("Procesando: $name");
+                
+                // Procesamos usando la instancia única del controlador
+                try {
+                    $rcController->RCServiceUnits($gpsService, $client);
+                } catch (\Exception $e) {
+                    // Si falla el proceso de este cliente, lo registramos pero NO detenemos el script
+                    $this->error("Error procesando $name: " . $e->getMessage());
+                    \Log::error("Error en comando RecursoConfiable para $name: " . $e->getMessage());
+                }
+
+            } else {
+                // Si no encuentra al cliente, avisa pero CONTINÚA con el siguiente
+                $this->error("Cliente no encontrado: $name");
+            }
         }
         $this->info('Comando ejecutado correctamente para recurso confiable.');
     }
