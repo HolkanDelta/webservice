@@ -128,10 +128,11 @@ return [
         ],
         
         'recurso_confiable' => [
-            'driver' => 'single',
+            'driver' => 'daily',
             'path' => storage_path('logs/recurso_confiable.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
         ],
 
     ],
