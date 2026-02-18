@@ -40,7 +40,7 @@ class RecursoConfiableCommand extends Command
 
         // 3. Iteramos sobre cada cliente
         foreach ($clientNames as $name) {
-            $client = Client::where('name', $name)->where('company_id','>',0)->first();
+            $client = Client::where('name', $name)->where('company_id','>=',0)->first();
             //dd($client);
             if ($client) {
                 $this->info("Procesando: $name");
