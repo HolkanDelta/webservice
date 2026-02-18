@@ -33,14 +33,14 @@ class RecursoConfiableCommand extends Command
 
         // 2. Definimos la lista de clientes a procesar
         $clientNames = [
-            'Logística y maniobras CAVA',
-            'Hector Manuel Orozco RecursoConfiable'
+            'LOGISTICA Y MANIOBRAS CAVA',
+            'Hector Manuel Orozco'
         ];
 
         // 3. Iteramos sobre cada cliente
         foreach ($clientNames as $name) {
-            $client = Client::where('name', $name)->first();
-
+            $client = Client::where('name', $name)->where('company_id','>',0)->first();
+            //dd($client);
             if ($client) {
                 $this->info("Procesando: $name");
                 

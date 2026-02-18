@@ -43,13 +43,17 @@ class RcController extends Controller
             $unitsind = $sdkMapon->units_id($client->apikey, $unit_id);
             $unitsind = json_decode($unitsind->getContent());
             foreach ($unitsind->data->units as $unit) {
+                $company = [
+                    'id' => $client->company_id,
+                    'name' => $client->name,
+                ];
                 $payload_data[] = [
                         "event" => [
                             [
                                 'code' => 0,
                                 'asset' => $unit->number ? $unit->number : $unit->label,
                                 'serialNumber' => $unit->device->imei ? $unit->device->imei : $unit->vin,
-                                'customer' => $client->company_id ? $client->company_id : NULL,
+                                'customer' => $company,
                                 'lat' => $unit->lat ? $unit->lat : 0,
                                 'lng' => $unit->lng ? $unit->lng : 0,
                                 'date' => $unit->last_update ? $unit->last_update : null,
