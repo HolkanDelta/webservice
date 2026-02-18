@@ -28,27 +28,23 @@ class recursoTokenChange extends Command
      */
     public function handle(RecursoConfiable $gpsService)
     {
-        //Logística y maniobras CAVA
-        $clientCAVA = Client::where('name', 'LOGISTICA Y MANIOBRAS CAVA')->where('company_id','>',0)->first();
-        if ($clientCAVA) {
-            $rcController= new RcController();
-            $rcController->RCServiceLogin($gpsService, $clientCAVA);
-            
-        } else {
-            $this->error('Cliente Logística y maniobras CAVA no encontrado.');
-            return;
-        }
 
-        //$client = Client::where('name', $name);
-       $clientHector = Client::where('name', 'Hector Manuel Orozco')->where('company_id','>',0)->first();
-        if ($clientHector) {
-            $rcController= new RcController();
-        $rcController->RCServiceLogin($gpsService, $clientHector);
-            
-        } else {
-            $this->error('Cliente Hector Manuel Orozco no encontrado.');
-            return;
+        $clientNames = [
+            'LOGISTICA Y MANIOBRAS CAVA',
+            'Hector Manuel Orozco',
+            'Transportes Terrestres Vazquez',
+        ];
+
+        foreach ($clientNames as $name) {
+            $client = Client::where('name', $name)->where('company_id','>=',0)->first();
+            if ($client) {
+                $rcController= new RcController();
+                $rcController->RCServiceLogin($gpsService, $client);
+            } else {
+                $this->error('Cliente ' . $name . ' no encontrado.');
+            }
         }
+        
         $this->info('Comando Login ejecutado correctamente para recurso confiable.');
         
     }
