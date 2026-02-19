@@ -32,7 +32,9 @@ class RcController extends Controller
         $unitslist = $unitslistsdk->units($client->apikey);
         $units = json_decode($unitslist->getContent());
         $unitsArray = [];
-        $payload_data = [];
+        $payload_data = [
+            "events" => []
+        ];
        
         foreach ($units->data->units as $unit) {
             $unitsArray[] = $unit->unit_id;
@@ -43,40 +45,40 @@ class RcController extends Controller
             $unitsind = json_decode($unitsind->getContent());
             foreach ($unitsind->data->units as $unit) {
                 $driving = $unit->state->name;
-                if ($driving == "driving") {
+                
+                //if ($driving == "driving") {                    
+                    //declara variable de customer
                     $company = [
                         'id' => $client->company_id,
                         'name' => $client->name,
                     ];
-                    $payload_data[] = [
-                            "event" => [
-                                [
-                                    'code' => 0,
-                                    'asset' => $unit->number ? $unit->number : $unit->label,
-                                    'serialNumber' => $unit->device->imei ? $unit->device->imei : $unit->vin,
-                                    'customer' => $company,
-                                    'lat' => $unit->lat ? $unit->lat : 0,
-                                    'lng' => $unit->lng ? $unit->lng : 0,
-                                    'date' => $unit->last_update ? $unit->last_update : null,
-                                    'speed' => $unit->speed ? $unit->speed : 0,
-                                    'ignition' => $unit->ignition_total_time ? $unit->ignition_total_time : NULL,
-                                    'battery' =>  '0',
-                                    'full_address' => '0',
+                    //construye payload
+                    $payload_data["events"]["Event"] = [
                                     'altitude' => '0',
-                                    'course' => $unit->direction ? $unit->direction : NULL,
-                                    'humidity' => '0',
-                                    'odometer' => $unit->mileage ? $unit->mileage : NULL,
-                                    'temperature' => '0',
-                                    'vehicleType' => $unit->type ? $unit->type : NULL,
+                                    'asset' => $unit->number ? $unit->number : $unit->label,
+                                    'battery' =>  '0',
+                                    'code' => '0',
+                                    'course' => $unit->direction ? (string) $unit->direction : '0',
+                                    'customer' => $company,
+                                    'date' => $unit->last_update ? (string) $unit->last_update : '0',
+                                    'direction' => '0',
+                                    'humidity' => '0.00',
+                                    'ignition' => true,
+                                    'latitude' => $unit->lat ?  $unit->lat : '0',
+                                    'longitude' => $unit->lng ?  $unit->lng : '0',
+                                    'odometer' => $unit->mileage ? (string) $unit->mileage : '0',
+                                    'serialNumber' => $unit->device->imei ? (string) $unit->device->imei : (string) $unit->vin,
+                                    'shipment' => '0',                          
+                                    'speed' => $unit->speed ? (string) $unit->speed : '0',
+                                    'temperature' => '0.00',
+                                    'vehicleType' => $unit->type ? $unit->type : '0',
                                     'vehicleBrand' => '0',
-                                    'vehicleModel' => '0',
-                                    'shipment' => '0',
-                                ]
-                            ]
-                    ];
-                }                
+                                    'vehicleModel' => '0',                            
+                    ];                    
+                //}                
             } 
         }
+        //dd($payload_data);
         $date = date('Y-m-d H:i:s');
         $filename = 'recurso_confiable_' . $date . '.log';
         $payload = json_encode($payload_data);
