@@ -32,9 +32,7 @@ class RcController extends Controller
         $unitslist = $unitslistsdk->units($client->apikey);
         $units = json_decode($unitslist->getContent());
         $unitsArray = [];
-        $payload_data = [
-            "events" => []
-        ];
+        $payload_data = [];
        
         foreach ($units->data->units as $unit) {
             $unitsArray[] = $unit->unit_id;
@@ -53,7 +51,7 @@ class RcController extends Controller
                         'name' => $client->name,
                     ];
                     //construye payload
-                    $payload_data["events"]["Event"][] = [
+                    $payload_data["Event"][] = [
                                     'altitude' => '0',
                                     'asset' => $unit->number ? $unit->number : $unit->label,
                                     'battery' =>  '0',
