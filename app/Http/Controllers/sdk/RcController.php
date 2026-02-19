@@ -53,7 +53,7 @@ class RcController extends Controller
                         'name' => $client->name,
                     ];
                     //construye payload
-                    $payload_data["events"]["Event"] = [
+                    $payload_data["events"]["Event"][] = [
                                     'altitude' => '0',
                                     'asset' => $unit->number ? $unit->number : $unit->label,
                                     'battery' =>  '0',
