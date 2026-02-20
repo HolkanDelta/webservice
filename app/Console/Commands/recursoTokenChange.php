@@ -30,8 +30,21 @@ class recursoTokenChange extends Command
     {
 
         $clientNames = [
+            'Transportes Pichardo',
+            'MONICA CORONA LINARES',
             'LOGISTICA Y MANIOBRAS CAVA',
             'Hector Manuel Orozco',
+            'Ernesto Soto Molina - Recurso Confiable WALMART',
+            'Ernesto Soto Molina',
+            'VIRIDIANA GM - RC',
+            'Ramiro Enrique Vargas Romero',
+            'José Mario Ruiz Torres',
+            'TMV',
+            'Holkan - Doble cero - RC',
+            'Conrado Martinez Tehuitzil',
+            'MARIA MATILDE EVELIA ALMARAZ REYES',
+            'PALLUS CARGO',
+            'TRAVILSA MP',
             'Transportes Terrestres Vazquez',
         ];
 

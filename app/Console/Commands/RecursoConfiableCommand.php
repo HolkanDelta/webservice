@@ -33,8 +33,18 @@ class RecursoConfiableCommand extends Command
 
         // 2. Definimos la lista de clientes a procesar
         $clientNames = [
+            'Transportes Pichardo',
+            'MONICA CORONA LINARES',
             'LOGISTICA Y MANIOBRAS CAVA',
             'Hector Manuel Orozco',
+            'Ernesto Soto Molina - Recurso Confiable WALMART',
+            'Ernesto Soto Molina',
+            'Ramiro Enrique Vargas Romero',
+            'TMV',
+            'Holkan - Doble cero - RC',
+            'Conrado Martinez Tehuitzil',
+            'PALLUS CARGO',
+            'TRAVILSA MP',
             'Transportes Terrestres Vazquez',
         ];
 
