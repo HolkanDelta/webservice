@@ -4,10 +4,11 @@ namespace App\Http\Controllers\sdk;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Client;
 
 class controlT extends Controller
 {
-    public function login($clientid)
+    public function login($clientId)
     {
         $client = Client::whereId($clientId)->first();
         $base_url = "https://hub.controlt.com.co";
@@ -20,7 +21,7 @@ class controlT extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-            "user" => $user,
+            "username" => $user,
             "password" => $password
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -35,7 +36,7 @@ class controlT extends Controller
     {
         $token = $this->login($clientid);
         $base_url = "https://hub.controlt.com.co";
-        $url = $base_url . "/Account/Auth";
+        
     }
     
 }

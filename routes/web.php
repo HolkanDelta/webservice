@@ -5,6 +5,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\sdk\sdkMapon;
 use App\Http\Controllers\sdk\sdkfleet;
 use App\Http\Controllers\sdk\RcController;
+use App\Http\Controllers\sdk\controlT;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -23,8 +24,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource(name:'clientes', controller:ClientController::class);
     Route::resource(name:'servicios', controller:ServiceController::class);
     Route::get('units', [sdkMapon::class, 'units'])->name('units');
+    //Fleet Rocket
     Route::get('login-fleet/{clientId}', [sdkfleet::class, 'login'])->name('login-fleet');
     Route::get('fleet-tracking/{clientId}', [sdkfleet::class, 'tracking'])->name('fleet-tracking');
+    //Rcontrol
     Route::get('test-soap', function () {
         $wsdl = "https://gps.rcontrol.com.mx/Tracking/wcf/RCService.svc?singleWsdl";
         $opts = [
@@ -45,6 +48,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     });
     Route::get('rcservice-login', [RcController::class, 'RCServiceLogin'])->name('rcservice-login');
+    // controlT
+    Route::get('controlT-login/{clientId}', [controlT::class, 'login'])->name('controlT-login');
+    //Route::get('controlT-tracking/{clientId}', [controlT::class, 'tracking'])->name('controlT-tracking');
 });
 
 require __DIR__.'/settings.php';
