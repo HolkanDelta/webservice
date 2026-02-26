@@ -28,10 +28,8 @@ class RecursoConfiableCommand extends Command
      */
     public function handle(RecursoConfiable $gpsService)
     {
-        // 1. Instanciamos el controlador UNA sola vez (ahorramos memoria)
         $rcController = new RcController();
 
-        // 2. Definimos la lista de clientes a procesar
         $clientNames = [
             'Transportes Pichardo',
             'MONICA CORONA LINARES',
@@ -48,27 +46,24 @@ class RecursoConfiableCommand extends Command
             'Transportes Terrestres Vazquez',
         ];
 
-        // 3. Iteramos sobre cada cliente
+      
         foreach ($clientNames as $name) {
             $client = Client::where('name', $name)->where('token','>=',0)->first();
-            //dd($client);
             if ($client) {
                 $this->info("Procesando: $name");
                 
-                // Procesamos usando la instancia única del controlador
                 try {
                     $rcController->RCServiceUnits($gpsService, $client);
                 } catch (\Exception $e) {
-                    // Si falla el proceso de este cliente, lo registramos pero NO detenemos el script
                     $this->error("Error procesando $name: " . $e->getMessage());
                     \Log::error("Error en comando RecursoConfiable para $name: " . $e->getMessage());
                 }
 
             } else {
-                // Si no encuentra al cliente, avisa pero CONTINÚA con el siguiente
                 $this->error("Cliente no encontrado: $name");
             }
         }
+        
         $this->info('Comando ejecutado correctamente para recurso confiable.');
     }
 }

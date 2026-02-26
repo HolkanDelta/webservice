@@ -16,6 +16,5 @@ Schedule::command('app:recurso-confiable-command')
     ->everyMinute();
     //->withoutOverlapping();
 
-Schedule::command('app:recurso-token-change')
-    ->twiceDaily(1, 13)
-    ->withoutOverlapping();
+Schedule::command('app:control-tcommand')
+    ->everyFiveMinutes();

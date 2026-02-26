@@ -34,12 +34,15 @@ class controlT extends Controller
         ]);
         $response = curl_exec($ch);
         curl_close($ch);
+        $token = json_decode($response);
+        $client->token = $token->access_token;
+        $client->save();
         return $response;
     }
 
     public function tracking($clientid)
     {
-        $token = json_decode( $this->login($clientid));
+        //$token = json_decode( $this->login($clientid));
         $client = Client::whereId($clientid)->first();
         $unitslistsdk = new sdkMapon();
         $sdkMapon = new sdkMapon();
@@ -92,7 +95,7 @@ class controlT extends Controller
                 ];
 
                 $response = Http::withHeaders([
-                    'Authorization' => $token->access_token, // Reemplaza los puntos por tu token real
+                    'Authorization' => $client->token, // Reemplaza los puntos por tu token real
                 ])->post('https://hub.controlt.com.co/Register/Insert', $body);
                 
                 
