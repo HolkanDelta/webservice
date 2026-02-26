@@ -44,6 +44,7 @@ class RecursoConfiableCommand extends Command
             'PALLUS CARGO',
             'TRAVILSA MP',
             'Transportes Terrestres Vazquez',
+            'Filiberto Villaseñor Villaseñor',
         ];
 
       

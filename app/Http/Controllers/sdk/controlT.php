@@ -78,15 +78,15 @@ class controlT extends Controller
                 ];
                 $nodoData = base64_encode(json_encode($initarr));
 
-                $dateEventGPS = Carbon::parse($unit->last_update)->setTimezone('-05:00');
-                $dateEventAVL = Carbon::parse($unit->created_at)->setTimezone('-05:00');
+                $dateEventGPS = Carbon::parse($unit->last_update)->setTimezone('America/Bogota');
+                $dateEventAVL = Carbon::parse($unit->created_at)->setTimezone('America/Bogota');
 
                 $body = [
                     'licensePlate' => substr($unit->number, 0, 6),
                     'latitude' => $unit->lat,
                     'longitude' => $unit->lng,
-                    'dateEventGPS' => $dateEventGPS,
-                    'dateEventAVL' => $dateEventAVL,
+                    'dateEventGPS' => $dateEventGPS->format('Y-m-d H:i:s'),
+                    'dateEventAVL' => $dateEventAVL->format('Y-m-d H:i:s'),
                     'typeEvent' => "01",
                     'codeEvent'  => $unit->type,
                     'descriptionEvent'  => $unit->vin,
