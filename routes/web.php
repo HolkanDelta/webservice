@@ -50,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('rcservice-login', [RcController::class, 'RCServiceLogin'])->name('rcservice-login');
     // controlT
     Route::get('controlT-login/{clientId}', [controlT::class, 'login'])->name('controlT-login');
-    //Route::get('controlT-tracking/{clientId}', [controlT::class, 'tracking'])->name('controlT-tracking');
+    Route::get('controlT-tracking/{clientId}', [controlT::class, 'tracking'])->name('controlT-tracking');
 });
 
 require __DIR__.'/settings.php';

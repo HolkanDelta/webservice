@@ -20,7 +20,7 @@ class sdkMapon extends Controller
        $response = Http::get('https://acceso.holkan.com.mx/api/v1/unit/list.json', [
             'key' => $key,
             'unit_id' => $unit_id,
-            'include' => 'device',
+            'include' => ['device','altitude'],
         ]);
         return response()->json($response->json());
     }

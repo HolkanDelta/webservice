@@ -134,6 +134,14 @@ return [
             'replace_placeholders' => true,
             'days' => env('LOG_DAILY_DAYS', 90),
         ],
+        
+        'controlT'=> [
+            'driver' => 'daily',
+            'path' => storage_path('logs/controlT.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
 
     ],
 
