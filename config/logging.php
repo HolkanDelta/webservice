@@ -143,6 +143,54 @@ return [
             'days' => env('LOG_DAILY_DAYS', 90),
         ],
 
+        'landstar' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/landstar.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
+        'logitrack' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/logitrack.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
+        'overhaul' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/overhaul.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
+        'pegasus' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/pegasus.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
+        'skyangel' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/skyangel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
+        'kronh' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/kronh.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
     ],
 
 ];

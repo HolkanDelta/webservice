@@ -6,10 +6,10 @@ use SoapClient;
 use SoapFault;
 use Illuminate\Support\Facades\Log;
 
-class RecursoConfiable
+class LandstarService
 {
     protected $client;
-    protected $wsdl = "https://gps.rcontrol.com.mx/Tracking/wcf/RCService.svc?singleWsdl";
+    protected $wsdl = "https://compass-landstar.centralus.cloudapp.azure.com/locations/locationReceiver.wsdl";
 
     public function __construct()
     {

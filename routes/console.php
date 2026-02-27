@@ -18,3 +18,6 @@ Schedule::command('app:recurso-confiable-command')
 
 Schedule::command('app:control-tcommand')
     ->everyFiveMinutes();
+
+Schedule::command('app:land-star-command')
+    ->everyFiveMinutes();

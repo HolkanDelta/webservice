@@ -6,6 +6,7 @@ use App\Http\Controllers\sdk\sdkMapon;
 use App\Http\Controllers\sdk\sdkfleet;
 use App\Http\Controllers\sdk\RcController;
 use App\Http\Controllers\sdk\controlT;
+use App\Http\Controllers\sdk\Landstar;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -68,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     });
+    Route::get('landstar-login', [Landstar::class, 'landstarauth'])->name('landstar-login');
     // controlT
     Route::get('controlT-login/{clientId}', [controlT::class, 'login'])->name('controlT-login');
     Route::get('controlT-tracking/{clientId}', [controlT::class, 'tracking'])->name('controlT-tracking');
