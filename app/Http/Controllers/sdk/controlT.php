@@ -79,14 +79,14 @@ class controlT extends Controller
                 $nodoData = base64_encode(json_encode($initarr));
 
                 $dateEventGPS = Carbon::parse($unit->last_update)->setTimezone('America/Bogota');
-                $dateEventAVL = Carbon::parse($unit->created_at)->setTimezone('America/Bogota');
+                $dateEventAVL = Carbon::now('America/Bogota');
 
                 $body = [
                     'licensePlate' => substr($unit->number, 0, 6),
                     'latitude' => $unit->lat,
                     'longitude' => $unit->lng,
-                    'dateEventGPS' => $dateEventGPS->format('Y-m-d H:i:s'),
-                    'dateEventAVL' => $dateEventAVL->format('Y-m-d H:i:s'),
+                    'dateEventGPS' => $dateEventGPS->format('Y-m-d\TH:i:s.u\Z'),
+                    'dateEventAVL' => $dateEventAVL->format('Y-m-d\TH:i:s.u\Z'),
                     'typeEvent' => "01",
                     'codeEvent'  => $unit->type,
                     'descriptionEvent'  => $unit->vin,
@@ -95,7 +95,7 @@ class controlT extends Controller
                 ];
 
                 $response = Http::withHeaders([
-                    'Authorization' => $client->token, // Reemplaza los puntos por tu token real
+                    'Authorization' => $client->token, 
                 ])->post('https://hub.controlt.com.co/Register/Insert', $body);
                 
                 
