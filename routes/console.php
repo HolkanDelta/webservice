@@ -21,3 +21,7 @@ Schedule::command('app:control-tcommand')
 
 Schedule::command('app:land-star-command')
     ->everyFiveMinutes();
+
+Schedule::command('app:sky-angelcommand')
+    ->everyFiveMinutes();
+    
