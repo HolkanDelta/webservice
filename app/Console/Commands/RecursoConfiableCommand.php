@@ -45,6 +45,7 @@ class RecursoConfiableCommand extends Command
             'TRAVILSA MP',
             'Transportes Terrestres Vazquez',
             'Filiberto Villaseñor Villaseñor',
+            'JOSE JORGE HUITZIL SANTIAGO',
         ];
 
       

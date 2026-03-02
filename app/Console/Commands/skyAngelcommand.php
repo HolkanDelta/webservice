@@ -32,6 +32,8 @@ class skyAngelcommand extends Command
         $clientNames = [
             'Magdalena Martínez Garduño',
             'TRANSMARS',
+            'Transportes Olvera - SKY',
+            'Transportes España',
         ];
         foreach ($clientNames as $clientName) {
             $client = Client::where('name', $clientName)->first();
