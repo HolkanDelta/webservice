@@ -52,7 +52,7 @@ class RcController extends Controller
                         'Ernesto Soto Molina',
 
                     ];
-                    $cname + $client->name;
+                    $cname = $client->name;
                     if (in_array($client->name, $clientes66319)) {
                         $cname = '66319';
                     }
