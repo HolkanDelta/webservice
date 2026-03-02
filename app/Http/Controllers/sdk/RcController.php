@@ -46,9 +46,19 @@ class RcController extends Controller
                 
                 //if ($driving == "driving") {                    
                     //declara variable de customer
+                    $clientes66319[
+                        'Ramiro Enrique Vargas Romero',
+                        'Ernesto Soto Molina - Recurso Confiable WALMART',
+                        'Ernesto Soto Molina',
+
+                    ];
+                    $cname + $client->name;
+                    if (in_array($client->name, $clientes66319)) {
+                        $cname = '66319';
+                    }
                     $company = [
                         'id' => $client->company_id,
-                        'name' => $client->name,
+                        'name' => $cname,
                     ];
                     //construye payload
                     $payload_data["Event"][] = [
