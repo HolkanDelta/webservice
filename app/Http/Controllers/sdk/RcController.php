@@ -46,7 +46,7 @@ class RcController extends Controller
                 
                 //if ($driving == "driving") {                    
                     //declara variable de customer
-                    $clientes66319[
+                    $clientes66319 = [
                         'Ramiro Enrique Vargas Romero',
                         'Ernesto Soto Molina - Recurso Confiable WALMART',
                         'Ernesto Soto Molina',
