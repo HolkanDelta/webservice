@@ -14,7 +14,7 @@ class skyAngelcommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:sky-angelcommand';
+    protected $signature = 'app:sky-angelcommand'; 
 
     /**
      * The console command description.
