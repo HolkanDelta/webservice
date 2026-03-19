@@ -31,7 +31,8 @@ class controlTcommand extends Command
 
         $clientNames = [
             'Transportes Ruiz',
-            'JOSE JORGE HUITZIL SANTIAGO CT'
+            'JOSE JORGE HUITZIL SANTIAGO CT',
+            'MONICA CORONA LINARES CT'
         ];
         foreach ($clientNames as $name) {
             # code...
