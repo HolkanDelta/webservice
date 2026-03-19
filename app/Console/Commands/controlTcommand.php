@@ -30,7 +30,8 @@ class controlTcommand extends Command
         $controlController = new controlT();
 
         $clientNames = [
-            'Transportes Ruiz'
+            'Transportes Ruiz',
+            'JOSE JORGE HUITZIL SANTIAGO CT'
         ];
         foreach ($clientNames as $name) {
             # code...
