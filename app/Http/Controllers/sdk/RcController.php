@@ -43,6 +43,7 @@ class RcController extends Controller
             $unitsind = json_decode($unitsind->getContent());
             foreach ($unitsind->data->units as $unit) {
                 $driving = $unit->state->name;
+                $imei = (string) ($unit->device?->imei ?? $unit->vin);
                 
                 //if ($driving == "driving") {                    
                     //declara variable de customer
@@ -76,7 +77,7 @@ class RcController extends Controller
                                     'latitude' => $unit->lat ?  $unit->lat : '0',
                                     'longitude' => $unit->lng ?  $unit->lng : '0',
                                     'odometer' => $unit->mileage ? (string) $unit->mileage : '0',
-                                    'serialNumber' => $unit->device->imei ? (string) $unit->device->imei : (string) $unit->vin,
+                                    'serialNumber' => $imei,
                                     'shipment' => '0',                          
                                     'speed' => $unit->speed ? (string) $unit->speed : '0',
                                     'temperature' => '0.00',
