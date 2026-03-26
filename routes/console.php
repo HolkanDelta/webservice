@@ -27,4 +27,7 @@ Schedule::command('app:sky-angelcommand')
 
 Schedule::command('app:pegasus-command')
     ->everyFiveMinutes();
+
+Schedule::command('app:kronh-command')
+    ->everyFiveMinutes();
     
