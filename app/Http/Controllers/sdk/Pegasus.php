@@ -36,6 +36,7 @@ class Pegasus extends Controller
             $unitsind = json_decode($unitsind->getContent());
             foreach ($unitsind->data->units as $unit) {
                 $driving = $unit->state->name;
+                $numero = fake()->numberBetween(9999, 999999);
                 $unixTimestamp = Carbon::parse($unit->last_update, 'America/Mexico_City')->timestamp;
                 $payload_data[] = [
                     'timestamp' => $unixTimestamp, 
@@ -47,8 +48,8 @@ class Pegasus extends Controller
                     'position.direction' => $unit->direction,
                     'position.speed' => $unit->speed ? (string) $unit->speed : 0,
                     'position.valid' => true,
-                    'event.enum' => "",
-                    'event.label' => "",                
+                    'event.enum' => $numero,
+                    'event.label' => "trckpnt",                
                     'metric.odometer' => $unit->mileage,
                     'protocol.id' => "rt.platform",
                     'device.type.id' => "rt.platform",
