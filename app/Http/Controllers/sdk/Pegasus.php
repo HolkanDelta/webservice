@@ -52,9 +52,7 @@ class Pegasus extends Controller
                     'event.label' => "trckpnt",                
                     'metric.odometer' => $unit->mileage,
                     'protocol.id' => "rt.platform",
-                    'device.type.id' => "rt.platform",
-                    'adas.snapshots.count' => 1,
-                    'adas.snapshot.timestamp' => $unixTimestamp     
+                    'device.type.id' => "rt.platform"
                 ];               
             }
         };
