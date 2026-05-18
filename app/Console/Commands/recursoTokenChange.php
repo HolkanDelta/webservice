@@ -46,6 +46,7 @@ class recursoTokenChange extends Command
             'PALLUS CARGO',
             'TRAVILSA MP',
             'Transportes Terrestres Vazquez',
+            'Luis Guillermo Becerril Palma',
         ];
 
         foreach ($clientNames as $name) {
