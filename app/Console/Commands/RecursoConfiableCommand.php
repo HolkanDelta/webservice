@@ -46,6 +46,7 @@ class RecursoConfiableCommand extends Command
             'Transportes Terrestres Vazquez',
             'Filiberto Villaseñor Villaseñor',
             'JOSE JORGE HUITZIL SANTIAGO',
+            'Luis Guillermo Becerril Palma',
         ];
 
       
