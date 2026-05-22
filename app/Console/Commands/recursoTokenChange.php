@@ -46,6 +46,7 @@ class recursoTokenChange extends Command
             'Filiberto Villaseñor Villaseñor',
             'JOSE JORGE HUITZIL SANTIAGO',
             'Luis Guillermo Becerril Palma',
+            'Logística tres Guerreras',
         ];
 
         foreach ($clientNames as $name) {

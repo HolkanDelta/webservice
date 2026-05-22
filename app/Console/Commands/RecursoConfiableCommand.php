@@ -47,6 +47,8 @@ class RecursoConfiableCommand extends Command
             'Filiberto Villaseñor Villaseñor',
             'JOSE JORGE HUITZIL SANTIAGO',
             'Luis Guillermo Becerril Palma',
+            'Logística tres Guerreras',
+            
         ];
 
       
