@@ -53,7 +53,9 @@ class recursoTokenChange extends Command
             $client = Client::where('name', $name)->where('company_id','>=',0)->first();
             if ($client) {
                 $rcController= new RcController();
-                $rcController->RCServiceLogin($gpsService, $client);
+                $resultado=$rcController->RCServiceLogin($gpsService, $client);
+                $this->info($name);
+                $this->info($resultado->getContent());
             } else {
                 $this->error('Cliente ' . $name . ' no encontrado.');
             }
