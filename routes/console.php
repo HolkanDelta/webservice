@@ -13,8 +13,10 @@ Schedule::command('fleet-rocket_command')
     ->withoutOverlapping();
 
 Schedule::command('app:recurso-confiable-command')
-    ->everyMinute();
+    ->everyFiveMinutes();
     //->withoutOverlapping();
+Schedule::command('app:recurso-token-change')
+    ->twiceDaily(10, 16, 10); 
 
 Schedule::command('app:control-tcommand')
     ->everyFiveMinutes();
