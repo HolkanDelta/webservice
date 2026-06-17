@@ -25,7 +25,7 @@ class Kronh extends Controller
         foreach ($units->data->units as $unit) {
             $unitsArray[] = $unit->unit_id;
         }
-        //dd( $unitsArray );
+        //dd( $units->data->units );
         $nowUtc = Carbon::now('UTC');
         foreach ($unitsArray as $unit_id) {            
             $unitsind = $sdkMapon->units_id($client->apikey, $unit_id);
@@ -41,7 +41,7 @@ class Kronh extends Controller
                         'Latitude'       => (string) $unit->lat,
                         'Longitude'      => (string) $unit->lng,
                         'IgnitionStatus' => 'true',
-                        'Speed'          => $unit->speed,
+                        'Speed'          => $unit->speed ? $unit->speed : 0,
                         'Course'         => $unit->direction,
                         'TempFrozen'     => 'NA',
                         'TempCold'       => 'NA',

@@ -12,6 +12,7 @@ class KronhTrackerService
     protected $endpoint = 'https://kws.kronh.com/TrackerWebServices/gps.asmx?';
     public function sendPositions(array $positions, $client)
     {
+        //dd($positions);
         try {
             $innerXml = "<ArrayOfPositions>";
             
