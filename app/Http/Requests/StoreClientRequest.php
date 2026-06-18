@@ -24,7 +24,7 @@ class StoreClientRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'user_name' => 'required|string|max:255',
-            'user_pass' => 'nullable|string|max:20',
+            'user_pass' => 'nullable|string|max:255',
             'apikey' => 'nullable|string|max:500',
             'token' => 'nullable|string|max:500',
             'services' => 'nullable|array',
