@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Sdk;
+namespace App\Http\Controllers\sdk;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\LandstarService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\sdk\sdkMapon;
 
 class Landstar extends Controller
 {
@@ -77,19 +78,16 @@ class Landstar extends Controller
         $payload = json_encode($payload_data);
         //dd($payload);
         $resultado = $gpsService->callMethod('GPSAssetTracking', [
-                     'token' => $client->token,
-                     'events' => $payload_data,
-                 ]);
-                 //dd($resultado);
-        $log_resultado = json_encode(
-            [
-                'payload' => $payload_data,
-                'resultado' => $resultado,
-            ]
-        );
-        //dd($log_resultado);
-        Log::channel('landstar')->info($log_resultado);
-        return response()->json($resultado);
+                      'token' => $client->token,
+                      'events' => $payload_data,
+                  ]);
+        $rawResponse = $gpsService->getLastResponse();
+        $log_resultado_arr = [
+            'payload' => $payload_data,
+            'resultado' => $rawResponse ?: $resultado,
+        ];
+        Log::channel('landstar')->info(json_encode($log_resultado_arr));
+        return $log_resultado_arr;
 
     }
 

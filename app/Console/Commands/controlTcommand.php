@@ -27,33 +27,67 @@ class controlTcommand extends Command
      */
     public function handle()
     {
+        $startTime = microtime(true);
         $controlController = new controlT();
 
-        $clientNames = [
-            'Transportes Ruiz',
-            'JOSE JORGE HUITZIL SANTIAGO CT',
-            'MONICA CORONA LINARES CT',
-            'Ariana Rodriguez Reyes PRO',
-        ];
-        foreach ($clientNames as $name) {
-            # code...
-            $client = Client::where('name', $name)->where('token','>=',0)->first();
-            if ($client) {
-                $this->info("Procesando: $name");
-                
-                try {
-                    $controlController->tracking($client->id);
-                } catch (\Exception $e) {
-                    $this->error("Error procesando $name: " . $e->getMessage());
-                    \Log::error("Error en comando RecursoConfiable para $name: " . $e->getMessage());
-                }
+        $service = \App\Models\Service::where('name', 'MAPON_CONTROL_T')->first();
+        if (!$service) {
+            $this->error('Servicio MAPON_CONTROL_T no encontrado.');
+            return;
+        }
 
-            } else {
-                $this->error("Cliente no encontrado: $name");
+        $clients = $service->clients()->where('token', '>=', 0)->get();
+        if ($clients->isEmpty()) {
+            $this->warn('No hay clientes con tokens válidos asignados al servicio MAPON_CONTROL_T.');
+            $service->logRun('success', 'No hay clientes con tokens válidos asignados.', 0);
+            return;
+        }
+
+        $failedClients = [];
+        $successCount = 0;
+        $payload = [];
+        foreach ($clients as $client) {
+            $this->info("Procesando: {$client->name}");
+            
+            try {
+                $res = $controlController->tracking($client->id);
+                $successCount++;
+                $payload[] = [
+                    'client' => $client->name,
+                    'status' => 'success',
+                    'message' => 'Sincronizado correctamente',
+                    'transmission_payload' => count($res) === 1 ? ($res[0]['payload'] ?? null) : array_column($res, 'payload'),
+                    'transmission_response' => count($res) === 1 ? ($res[0]['resultado'] ?? null) : array_column($res, 'resultado'),
+                ];
+            } catch (\Exception $e) {
+                $failedClients[] = "{$client->name}: " . $e->getMessage();
+                $payload[] = [
+                    'client' => $client->name,
+                    'status' => 'failure',
+                    'message' => $e->getMessage(),
+                    'transmission_payload' => null,
+                    'transmission_response' => null,
+                ];
+                $this->error("Error procesando {$client->name}: " . $e->getMessage());
+                \Log::error("Error en comando controlT para {$client->name}: " . $e->getMessage());
             }
         }
 
-         $this->info('Comando ejecutado correctamente para control T.');
+        $runtimeMs = round((microtime(true) - $startTime) * 1000);
+        $totalCount = count($clients);
 
+        if (count($failedClients) === 0) {
+            $status = 'success';
+            $message = "Sincronizados correctamente {$successCount} de {$totalCount} clientes.";
+        } elseif ($successCount > 0) {
+            $status = 'partial';
+            $message = "Sincronizados {$successCount} de {$totalCount} clientes. Errores: " . implode(', ', $failedClients);
+        } else {
+            $status = 'failure';
+            $message = "Todos los clientes fallaron ({$totalCount}). Errores: " . implode(', ', $failedClients);
+        }
+
+        $service->logRun($status, $message, $runtimeMs, $payload);
+        $this->info('Comando ejecutado correctamente para control T.');
     }
 }

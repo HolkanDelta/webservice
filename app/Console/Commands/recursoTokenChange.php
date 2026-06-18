@@ -28,40 +28,62 @@ class recursoTokenChange extends Command
      */
     public function handle(RecursoConfiable $gpsService)
     {
+        $startTime = microtime(true);
+        $service = \App\Models\Service::where('name', 'MAPON - RECURSO_CONFIABLE')->first();
+        if (!$service) {
+            $this->error('Servicio MAPON - RECURSO_CONFIABLE no encontrado.');
+            return;
+        }
 
-        $clientNames = [
-            'Transportes Pichardo',
-            'MONICA CORONA LINARES',
-            'LOGISTICA Y MANIOBRAS CAVA',
-            'Hector Manuel Orozco',
-            'Ernesto Soto Molina - Recurso Confiable WALMART',
-            'Ernesto Soto Molina',
-            'Ramiro Enrique Vargas Romero',
-            'TMV',
-            'Doble cero',
-            'Conrado Martinez Tehuitzil',
-            'PALLUS CARGO',
-            'TRAVILSA S.A. de C.V',
-            'Transportes Terrestres Vazquez',
-            'Filiberto Villaseñor Villaseñor',
-            'JOSE JORGE HUITZIL SANTIAGO',
-            'Luis Guillermo Becerril Palma',
-            'Logística tres Guerreras',
-        ];
+        $clients = $service->clients()->whereNotNull('company_id')->get();
+        if ($clients->isEmpty()) {
+            $this->warn('No hay clientes con company_id asignados al servicio MAPON - RECURSO_CONFIABLE.');
+            $service->logRun('success', 'No hay clientes con company_id para autenticación.', 0);
+            return;
+        }
 
-        foreach ($clientNames as $name) {
-            $client = Client::where('name', $name)->where('company_id','>=',0)->first();
-            if ($client) {
-                $rcController= new RcController();
-                $resultado=$rcController->RCServiceLogin($gpsService, $client);
-                $this->info($name);
+        $failedClients = [];
+        $successCount = 0;
+        $payload = [];
+        foreach ($clients as $client) {
+            $this->info("Autenticando Recurso Confiable para: {$client->name}");
+            try {
+                $rcController = new RcController();
+                $resultado = $rcController->RCServiceLogin($gpsService, $client);
+                $this->info($client->name);
                 $this->info($resultado->getContent());
-            } else {
-                $this->error('Cliente ' . $name . ' no encontrado.');
+                $successCount++;
+                $payload[] = [
+                    'client' => $client->name,
+                    'status' => 'success',
+                    'message' => 'Autenticado correctamente'
+                ];
+            } catch (\Exception $e) {
+                $failedClients[] = "{$client->name}: " . $e->getMessage();
+                $payload[] = [
+                    'client' => $client->name,
+                    'status' => 'failure',
+                    'message' => $e->getMessage()
+                ];
+                $this->error("Error autenticando {$client->name}: " . $e->getMessage());
             }
         }
         
+        $runtimeMs = round((microtime(true) - $startTime) * 1000);
+        $totalCount = count($clients);
+
+        if (count($failedClients) === 0) {
+            $status = 'success';
+            $message = "Autenticación de Recurso Confiable completada para {$successCount} de {$totalCount} clientes.";
+        } elseif ($successCount > 0) {
+            $status = 'partial';
+            $message = "Autenticación parcial de Recurso Confiable. Éxito: {$successCount}/{$totalCount}. Errores: " . implode(', ', $failedClients);
+        } else {
+            $status = 'failure';
+            $message = "Autenticación de Recurso Confiable fallida ({$totalCount}). Errores: " . implode(', ', $failedClients);
+        }
+
+        $service->logRun($status, $message, $runtimeMs, $payload);
         $this->info('Comando Login ejecutado correctamente para recurso confiable.');
-        
     }
 }

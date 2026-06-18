@@ -49,13 +49,17 @@ class Kronh extends Controller
                 ];                
             }
         }
-        //$kronhService = new KronhTrackerService();
         $resultado = $kronhService->sendPositions($posiciones, $client);
 
+        $rawResponse = $kronhService->getLastResponse();
+
         if ($resultado === 1) {
-            return "¡Datos enviados con éxito a KRONH!";
+            return [
+                'payload' => $posiciones,
+                'resultado' => $rawResponse ?: 'Posiciones enviadas y guardadas correctamente (1)'
+            ];
         }
 
-        return "Hubo un error al enviar los datos. Revisa los logs.";
+        throw new \Exception("Hubo un error al enviar los datos a KRONH. Respuesta: " . ($rawResponse ?: 'Sin respuesta.'));
     }
 }

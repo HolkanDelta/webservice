@@ -15,4 +15,24 @@ class Service extends Model
         'base_url',
         'recurrence'
     ];
+
+    public function clients()
+    {
+        return $this->belongsToMany(Client::class);
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(ServiceLog::class);
+    }
+
+    public function logRun(string $status, ?string $message = null, int $runtimeMs = 0, ?array $payload = null): ServiceLog
+    {
+        return $this->logs()->create([
+            'status' => $status,
+            'message' => $message,
+            'runtime_ms' => $runtimeMs,
+            'payload' => $payload,
+        ]);
+    }
 }

@@ -53,4 +53,9 @@ class RecursoConfiable
     {
         return $this->callMethod('GetTracking', ['deviceId' => $deviceId]);
     }
+
+    public function getLastResponse()
+    {
+        return $this->client ? $this->client->__getLastResponse() : null;
+    }
 }

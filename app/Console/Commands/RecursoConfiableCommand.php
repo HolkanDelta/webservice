@@ -28,47 +28,67 @@ class RecursoConfiableCommand extends Command
      */
     public function handle(RecursoConfiable $gpsService)
     {
+        $startTime = microtime(true);
         $rcController = new RcController();
 
-        $clientNames = [
-            'Transportes Pichardo',
-            'MONICA CORONA LINARES',
-            'LOGISTICA Y MANIOBRAS CAVA',
-            'Hector Manuel Orozco',
-            'Ernesto Soto Molina - Recurso Confiable WALMART',
-            'Ernesto Soto Molina',
-            'Ramiro Enrique Vargas Romero',
-            'TMV',
-            'Doble cero',
-            'Conrado Martinez Tehuitzil',
-            'PALLUS CARGO',
-            'TRAVILSA S.A. de C.V',
-            'Transportes Terrestres Vazquez',
-            'Filiberto Villaseñor Villaseñor',
-            'JOSE JORGE HUITZIL SANTIAGO',
-            'Luis Guillermo Becerril Palma',
-            'Logística tres Guerreras',
+        $service = \App\Models\Service::where('name', 'MAPON - RECURSO_CONFIABLE')->first();
+        if (!$service) {
+            $this->error('Servicio MAPON - RECURSO_CONFIABLE no encontrado.');
+            return;
+        }
+
+        $clients = $service->clients()->where('token', '>=', 0)->get();
+        if ($clients->isEmpty()) {
+            $this->warn('No hay clientes con tokens válidos asignados al servicio MAPON - RECURSO_CONFIABLE.');
+            $service->logRun('success', 'No hay clientes con tokens válidos asignados.', 0);
+            return;
+        }
+
+        $failedClients = [];
+        $successCount = 0;
+        $payload = [];
+        foreach ($clients as $client) {
+            $this->info("Procesando: {$client->name}");
             
-        ];
-
-      
-        foreach ($clientNames as $name) {
-            $client = Client::where('name', $name)->where('token','>=',0)->first();
-            if ($client) {
-                $this->info("Procesando: $name");
-                
-                try {
-                    $rcController->RCServiceUnits($gpsService, $client);
-                } catch (\Exception $e) {
-                    $this->error("Error procesando $name: " . $e->getMessage());
-                    \Log::error("Error en comando RecursoConfiable para $name: " . $e->getMessage());
-                }
-
-            } else {
-                $this->error("Cliente no encontrado: $name");
+            try {
+                $res = $rcController->RCServiceUnits($gpsService, $client);
+                $successCount++;
+                $payload[] = [
+                    'client' => $client->name,
+                    'status' => 'success',
+                    'message' => 'Sincronizado correctamente',
+                    'transmission_payload' => $res['payload'] ?? null,
+                    'transmission_response' => $res['resultado'] ?? null,
+                ];
+            } catch (\Exception $e) {
+                $failedClients[] = "{$client->name}: " . $e->getMessage();
+                $payload[] = [
+                    'client' => $client->name,
+                    'status' => 'failure',
+                    'message' => $e->getMessage(),
+                    'transmission_payload' => null,
+                    'transmission_response' => null,
+                ];
+                $this->error("Error procesando {$client->name}: " . $e->getMessage());
+                \Log::error("Error en comando RecursoConfiable para {$client->name}: " . $e->getMessage());
             }
         }
         
+        $runtimeMs = round((microtime(true) - $startTime) * 1000);
+        $totalCount = count($clients);
+
+        if (count($failedClients) === 0) {
+            $status = 'success';
+            $message = "Sincronizados correctamente {$successCount} de {$totalCount} clientes.";
+        } elseif ($successCount > 0) {
+            $status = 'partial';
+            $message = "Sincronizados {$successCount} de {$totalCount} clientes. Errores: " . implode(', ', $failedClients);
+        } else {
+            $status = 'failure';
+            $message = "Todos los clientes fallaron ({$totalCount}). Errores: " . implode(', ', $failedClients);
+        }
+
+        $service->logRun($status, $message, $runtimeMs, $payload);
         $this->info('Comando ejecutado correctamente para recurso confiable.');
     }
 }

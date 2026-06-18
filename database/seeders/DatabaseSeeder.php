@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ClientSeeder::class,
             ServiceSeeder::class,
+            ClientServiceSeeder::class,
+            ServiceLogSeeder::class,
         ]);
 
         User::firstOrCreate(

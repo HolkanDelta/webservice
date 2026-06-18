@@ -18,5 +18,8 @@ class Client extends Model
         'apikey'
     ];
 
-    
+    public function services()
+    {
+        return $this->belongsToMany(Service::class);
+    }
 }

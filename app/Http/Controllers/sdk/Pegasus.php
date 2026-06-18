@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Sdk;
+namespace App\Http\Controllers\sdk;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -58,13 +58,17 @@ class Pegasus extends Controller
 
         $response = Http::withHeaders($headers)->post($base_url, $payload_data);
         
-        $log_resultado = json_encode(
-            [
-                'payload' => $payload_data,
-                'resultado' => $response->body(),
-            ]
-        );
+        $log_resultado_arr = [
+            'payload' => $payload_data,
+            'resultado' => $response->body(),
+        ];
         
-        Log::channel('pegasus')->info($log_resultado);
+        Log::channel('pegasus')->info(json_encode($log_resultado_arr));
+
+        if ($response->successful()) {
+            return $log_resultado_arr;
+        }
+
+        throw new \Exception("Error al enviar a Pegasus: " . $response->body());
     }
 }

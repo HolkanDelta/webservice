@@ -93,20 +93,15 @@ class RcController extends Controller
         $filename = 'recurso_confiable_' . $date . '.log';
         $payload = json_encode($payload_data);
         $resultado = $gpsService->callMethod('GPSAssetTracking', [
-                     'token' => $client->token,
-                     'events' => $payload_data,
-                 ]);
-        $log_resultado = json_encode(
-            [
-                'payload' => $payload_data,
-                'resultado' => $resultado,
-            ]
-        );
-        Log::channel('recurso_confiable')->info($log_resultado);
-        return response()->json($resultado);
+                      'token' => $client->token,
+                      'events' => $payload_data,
+                  ]);
+        $rawResponse = $gpsService->getLastResponse();
+        $log_resultado_arr = [
+            'payload' => $payload_data,
+            'resultado' => $rawResponse ?: $resultado,
+        ];
+        Log::channel('recurso_confiable')->info(json_encode($log_resultado_arr));
+        return $log_resultado_arr;
     }
 }
-
-     
-     
-     

@@ -49,6 +49,7 @@ export interface Client {
     user_key: string;
     token: string;
     apikey: string;
+    services?: Service[];
 }
 export interface Service {
     id: number;
@@ -58,4 +59,21 @@ export interface Service {
     recurrence: string;
     created_at: string;
     updated_at: string;
+    clients?: Client[];
+}
+
+import { Config, RouteParam, RouteParamsWithQueryOverload } from 'ziggy-js';
+
+declare global {
+    var route: ((
+        name?: undefined,
+        params?: RouteParamsWithQueryOverload | RouteParam,
+        absolute?: boolean,
+        config?: Config,
+    ) => any) & ((
+        name: string,
+        params?: RouteParamsWithQueryOverload | RouteParam,
+        absolute?: boolean,
+        config?: Config,
+    ) => string);
 }

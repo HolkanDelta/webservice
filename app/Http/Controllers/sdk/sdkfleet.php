@@ -60,9 +60,10 @@ class sdkfleet extends Controller
         $client = Client::whereId($clientId)->first();
         if ($client){
             $units = new sdkMapon();
-            $units = $units->units();
+            $units = $units->units($client->apikey);
             $units = json_decode($units->getContent());
-          // dd($units->data->units);
+            
+            $all_results = [];
             foreach ($units->data->units as $unit) {
 
                 $payload_data = [
@@ -103,14 +104,17 @@ class sdkfleet extends Controller
                 ));
 
                 $response = curl_exec($curl);
-
                 curl_close($curl);
-                return response()->json(json_decode($response, true));
+                
+                $all_results[] = [
+                    'payload' => $payload_data,
+                    'resultado' => json_decode($response, true),
+                ];
             }
-            
+            return $all_results;
             
         }else {
-            return response()->json(['error' => 'Client not found'], 404);
+            throw new \Exception("Client not found");
         }
     }
 }

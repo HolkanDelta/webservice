@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\sdk\sdkMapon;
 use App\Http\Controllers\sdk\sdkfleet;
 use App\Http\Controllers\sdk\RcController;
@@ -18,9 +19,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource(name:'clientes', controller:ClientController::class);
     Route::resource(name:'servicios', controller:ServiceController::class);

@@ -42,6 +42,7 @@ class controlT extends Controller
 
     public function tracking($clientid)
     {
+        $all_results = [];
         //$token = json_decode( $this->login($clientid));
         $client = Client::whereId($clientid)->first();
         $unitslistsdk = new sdkMapon();
@@ -73,8 +74,15 @@ class controlT extends Controller
                     'Temperature1' => '',
                     'Temperature2' => '',
                     'City' => "null",
-                    'Department' => "null",
-                    'Address' => "null null 0",
+                    'State' => "null",
+                    'Reference' => "null",
+                    'Latitude' => $unit->lat,
+                    'Longitude' => $unit->lng,
+                    'Date' => Carbon::parse($unit->last_update)->setTimezone('America/Bogota')->format('YmdHis'),
+                    'Fuel' => 0,
+                    'Inputs' => "0000",
+                    'Outputs' => "00",
+                    'GpsValid' => 1,
                 ];
                 $nodoData = base64_encode(json_encode($initarr));
 
@@ -99,18 +107,16 @@ class controlT extends Controller
                 ])->post('https://hub.controlt.com.co/Register/Insert', $body);
                 
                 
-                $log_resultado = json_encode(
-                    [
-                        'payload' => $body,
-                        'resultado' => $response->body(),
-                    ]
-                );
+                $log_resultado_arr = [
+                    'payload' => $body,
+                    'resultado' => $response->body(),
+                ];
 
-                Log::channel('controlT')->info($log_resultado);              
-
+                Log::channel('controlT')->info(json_encode($log_resultado_arr));              
+                $all_results[] = $log_resultado_arr;
             };
         };
-        return "Las unidades fueron transferidas a control T";
+        return $all_results;
         
     }
     

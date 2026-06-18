@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Sdk;
+namespace App\Http\Controllers\sdk;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,6 +13,7 @@ class SkyAngel extends Controller
 {
     public function skyangelUnits( $client )
     {
+        $all_results = [];
         $unitslistsdk = new sdkMapon();
         $sdkMapon = new sdkMapon();
         $unitslist = $unitslistsdk->units($client->apikey);
@@ -48,16 +49,14 @@ class SkyAngel extends Controller
                     'gasolina' => ""                  
                 ];
                 $response = Http::post('http://api.skyangel.com.mx:8081/insertaMov/', $payload_data);
-                $log_resultado = json_encode(
-                    [
-                        'payload' => $payload_data,
-                        'resultado' => $response->body(),
-                    ]
-                );
-                Log::channel('skyangel')->info($log_resultado);
-                
+                $log_resultado_arr = [
+                    'payload' => $payload_data,
+                    'resultado' => $response->body(),
+                ];
+                Log::channel('skyangel')->info(json_encode($log_resultado_arr));
+                $all_results[] = $log_resultado_arr;
             } 
         }
-
+        return $all_results;
     }
 }

@@ -61,6 +61,17 @@ class ServiceSeeder extends Seeder
             'base_url' => 'https://compass-landstar.centralus.cloudapp.azure.com/locations/locationReceiver.wsdl',
             'recurrence' => true,
         ]);
-        
+        Service::create([
+            'name' => 'MAPON_FLEET_ROCKET',
+            'description' => 'Fleet Rocket',
+            'base_url' => 'https://my.fleetrocket.io/v1',
+            'recurrence' => true,
+        ]);
+        Service::create([
+            'name' => 'MAPON_UNIGIS',
+            'description' => 'Unigis',
+            'base_url' => 'https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx',
+            'recurrence' => true,
+        ]);
     }
 }

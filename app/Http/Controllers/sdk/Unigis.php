@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\sdk\sdkMapon;
 use App\Models\Client;
 
-class UnigisController extends Controller
+class Unigis extends Controller
 {
     public function UnigisLogin(UnigisService $unigisService, $client)
     {
@@ -58,7 +58,7 @@ class UnigisController extends Controller
         $result = $unigisService->callMethod('LoginYInsertarEventos', [
             'SystemUser' => $client->user_name,
             'Password' => $client->user_pass,
-            'Eventos' => $arrayofEvents,
+            'Eventos' => $payload_data,
         ]);
         return response()->json($result);
     }

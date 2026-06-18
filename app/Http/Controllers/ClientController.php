@@ -17,7 +17,7 @@ class ClientController extends Controller
     public function index()
     {
         return Inertia::render('clients/index', [
-        'clients' => Client::all(),
+            'clients' => Client::with('services')->get(),
         ]);
     }
 
@@ -26,7 +26,9 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return Inertia::render('clients/create');
+        return Inertia::render('clients/create', [
+            'services' => \App\Models\Service::all(),
+        ]);
     }
 
     /**
@@ -34,16 +36,20 @@ class ClientController extends Controller
      */
     public function store(StoreClientRequest $request)
     {
-        Client::create($request->validated());
+        $client = Client::create($request->validated());
+        $client->services()->sync($request->input('services', []));
         return redirect()->route('clientes.index');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Client $client)
+    public function show(Client $cliente)
     {
-        //
+        $cliente->load('services');
+        return Inertia::render('clients/show', [
+            'cliente' => $cliente,
+        ]);
     }
 
     /**
@@ -51,8 +57,10 @@ class ClientController extends Controller
      */
     public function edit(Client $cliente)
     {
+        $cliente->load('services');
         return Inertia::render('clients/edit', [
             'cliente' => $cliente,
+            'services' => \App\Models\Service::all(),
         ]);
     }
 
@@ -62,15 +70,16 @@ class ClientController extends Controller
     public function update(UpdateClientRequest $request, Client $cliente)
     {
         $cliente->update($request->validated());
+        $cliente->services()->sync($request->input('services', []));
         return redirect()->route('clientes.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Client $client)
+    public function destroy(Client $cliente)
     {
-        $client->delete();
+        $cliente->delete();
         return redirect()->route('clientes.index');
     }
 

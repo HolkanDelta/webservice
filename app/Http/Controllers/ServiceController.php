@@ -15,7 +15,7 @@ class ServiceController extends Controller
     public function index()
     {
         return Inertia::render('services/index', [
-            'services' => Service::all(),
+            'services' => Service::with('clients')->get(),
         ]);
     }
 
@@ -39,9 +39,12 @@ class ServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Service $service)
+    public function show(Service $servicio)
     {
-        //
+        $servicio->load('clients');
+        return Inertia::render('services/show', [
+            'servicio' => $servicio,
+        ]);
     }
 
     /**
@@ -57,18 +60,18 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateServiceRequest $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $servicio)
     {
-        $service->update($request->validated());
+        $servicio->update($request->validated());
         return redirect()->route('servicios.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service)
+    public function destroy(Service $servicio)
     {
-        $service->delete();
+        $servicio->delete();
         return redirect()->route('servicios.index');
     }
 }

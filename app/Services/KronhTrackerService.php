@@ -10,6 +10,13 @@ use Exception;
 class KronhTrackerService
 {
     protected $endpoint = 'https://kws.kronh.com/TrackerWebServices/gps.asmx?';
+    protected $lastResponse = null;
+
+    public function getLastResponse()
+    {
+        return $this->lastResponse;
+    }
+
     public function sendPositions(array $positions, $client)
     {
         //dd($positions);
@@ -34,7 +41,7 @@ class KronhTrackerService
             }
             
             $innerXml .= "</ArrayOfPositions>";
-
+ 
             $escapedPositionsList = htmlspecialchars($innerXml, ENT_XML1, 'UTF-8');
 
             $soapEnvelope = trim('<?xml version="1.0" encoding="utf-8"?>
@@ -57,6 +64,7 @@ class KronhTrackerService
             ]);
 
             $responseBody = $response->body();
+            $this->lastResponse = $responseBody;
 
             $payload_data = $positions; 
             $resultado = $responseBody;
