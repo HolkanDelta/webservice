@@ -22,7 +22,7 @@ class Landstar extends Controller
         $client->save();
         return response()->json($resultado);
     }
-    public function landstarUnits(LandstarService $gpsService, $client): JsonResponse
+    public function landstarUnits(LandstarService $gpsService, $client): array
     {
         $unitslistsdk = new sdkMapon();
         $sdkMapon = new sdkMapon();

@@ -25,7 +25,7 @@ class RcController extends Controller
         $client->save();
         return response()->json($resultado);
     }
-    public function RCServiceUnits(RecursoConfiable $gpsService, $client): JsonResponse
+    public function RCServiceUnits(RecursoConfiable $gpsService, $client): array
     {
         $unitslistsdk = new sdkMapon();
         $sdkMapon = new sdkMapon();
