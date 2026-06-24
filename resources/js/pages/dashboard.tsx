@@ -66,7 +66,8 @@ interface DashboardProps {
 
 export default function Dashboard({ metrics, services, recent_logs }: DashboardProps) {
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
-    const [expandedClientIndex, setExpandedClientIndex] = useState<number | null>(null);
+    const [expandedClientName, setExpandedClientName] = useState<string | null>(null);
+    const [clientSearchFilter, setClientSearchFilter] = useState('');
 
     const safeStringify = (val: any, pretty: boolean = false): string => {
         if (val === null || val === undefined) return '';
@@ -111,14 +112,16 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
         return 'bg-red-500';
     };
 
-    const exportToExcel = (service: ServiceData) => {
-        if (!service.last_run || !service.last_run.payload) return;
+    const exportToExcel = (service: ServiceData, customItems?: any[], singleClientName?: string) => {
+        if (!service.last_run) return;
+        const payloadToExport = customItems || service.last_run.payload;
+        if (!payloadToExport || payloadToExport.length === 0) return;
         
         const timestamp = new Date(service.last_run.created_at).toLocaleString('es-ES');
         let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Add BOM for UTF-8 Excel support
         csvContent += "Fecha/Hora,Cliente,Estado,Respuesta/Mensaje,Payload Enviado (GPS Data),Respuesta Servidor (SOAP/REST)\n";
         
-        service.last_run.payload.forEach((row: any) => {
+        payloadToExport.forEach((row: any) => {
             const statusText = row.status === 'success' ? 'Correcto' : 'Error';
             const cleanMessage = (row.message || '').replace(/"/g, '""');
             const cleanPayload = safeStringify(row.transmission_payload).replace(/"/g, '""');
@@ -130,81 +133,45 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `interaccion_${service.name.replace(/\s+/g, '_')}.csv`);
+        
+        const filenameSuffix = singleClientName 
+            ? `${service.name.replace(/\s+/g, '_')}_${singleClientName.replace(/\s+/g, '_')}` 
+            : `${service.name.replace(/\s+/g, '_')}`;
+        link.setAttribute("download", `interaccion_${filenameSuffix}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
 
-    const exportToPdf = (service: ServiceData) => {
-        if (!service.last_run || !service.last_run.payload) return;
+    const exportToPdf = (service: ServiceData, customItems?: any[], singleClientName?: string) => {
+        if (!service.last_run) return;
+        const payloadToExport = customItems || service.last_run.payload;
+        if (!payloadToExport || payloadToExport.length === 0) return;
         
         const doc = new jsPDF();
         
-        // --- PAGE 1: Executive Summary ---
+        // --- PAGE 1: Summary ---
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
-        doc.text(`Reporte de Transmisiones: ${service.description || service.name}`, 14, 20);
+        const titleText = singleClientName 
+            ? `Reporte de Transmisiones: ${singleClientName}`
+            : `Reporte de Transmisiones: ${service.description || service.name}`;
+        doc.text(titleText, 14, 20);
         
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text(`Identificador: ${service.name}`, 14, 28);
+        doc.text(`Identificador Canal: ${service.name}`, 14, 28);
         doc.text(`Fecha Ejecucion: ${new Date(service.last_run.created_at).toLocaleString('es-ES')}`, 14, 34);
-        doc.text(`Estado General: ${service.last_run.status.toUpperCase()}`, 14, 40);
-        doc.text(`Mensaje: ${service.last_run.message || 'Sin mensaje'}`, 14, 46);
         
-        doc.setDrawColor(220, 220, 220);
-        doc.line(14, 52, 196, 52);
-        
-        doc.setFont("helvetica", "bold");
-        doc.text("Cliente", 14, 60);
-        doc.text("Estado", 90, 60);
-        doc.text("Resumen de Transmision", 125, 60);
-        
-        doc.setFont("helvetica", "normal");
-        let y = 68;
-        
-        service.last_run.payload.forEach((row: any) => {
-            if (y > 270) {
-                doc.addPage();
-                y = 20;
-                doc.setFont("helvetica", "bold");
-                doc.text("Cliente", 14, y);
-                doc.text("Estado", 90, y);
-                doc.text("Resumen de Transmision", 125, y);
-                doc.setFont("helvetica", "normal");
-                y += 8;
-            }
+        if (singleClientName) {
+            const singleRow = payloadToExport[0];
+            doc.text(`Cliente: ${singleRow.client}`, 14, 40);
+            doc.text(`Estado Cliente: ${singleRow.status.toUpperCase()}`, 14, 46);
+            doc.text(`Respuesta Cliente: ${singleRow.message || 'Sin mensaje'}`, 14, 52);
+            doc.setDrawColor(220, 220, 220);
+            doc.line(14, 58, 196, 58);
             
-            doc.text(row.client.substring(0, 35), 14, y);
-            doc.text(row.status === 'success' ? 'Correcto' : 'Error', 90, y);
-            
-            const messageText = row.message || '';
-            const splitMessage = doc.splitTextToSize(messageText, 70);
-            doc.text(splitMessage, 125, y);
-            
-            const linesCount = splitMessage.length;
-            y += Math.max(8, linesCount * 5);
-        });
-        
-        // --- FOLLOWING PAGES: Detailed Payload & SOAP Response per Client ---
-        service.last_run.payload.forEach((row: any) => {
-            doc.addPage();
-            y = 20;
-            
-            // Client Header
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(13);
-            doc.text(`Detalle de Trafico: ${row.client}`, 14, y);
-            y += 8;
-            
-            doc.setFontSize(9);
-            doc.text(`Fecha Ejecución: ${new Date(service.last_run!.created_at).toLocaleString('es-ES')}`, 14, y);
-            y += 5;
-            doc.text(`Estado: ${row.status.toUpperCase()}`, 14, y);
-            y += 5;
-            doc.text(`Respuesta: ${row.message || '—'}`, 14, y);
-            y += 8;
+            let y = 66;
             
             // Draw payload
             doc.setFontSize(9);
@@ -213,11 +180,11 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
             y += 5;
             doc.setFont("courier", "normal");
             doc.setFontSize(7.5);
-            const payloadStr = safeStringify(row.transmission_payload, true) || 'Sin datos';
+            const payloadStr = safeStringify(singleRow.transmission_payload, true) || 'Sin datos';
             const splitPayload = doc.splitTextToSize(payloadStr, 180);
             
             for (let i = 0; i < splitPayload.length; i++) {
-                if (y > 280) {
+                if (y > 285) {
                     doc.addPage();
                     y = 20;
                 }
@@ -227,7 +194,7 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
             
             // Draw response
             y += 6;
-            if (y > 260) {
+            if (y > 265) {
                 doc.addPage();
                 y = 20;
             }
@@ -237,25 +204,132 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
             y += 5;
             doc.setFont("courier", "normal");
             doc.setFontSize(7.5);
-            const responseStr = safeStringify(row.transmission_response, true) || 'Sin respuesta';
+            const responseStr = safeStringify(singleRow.transmission_response, true) || 'Sin respuesta';
             const splitResponse = doc.splitTextToSize(responseStr, 180);
             
             for (let i = 0; i < splitResponse.length; i++) {
-                if (y > 280) {
+                if (y > 285) {
                     doc.addPage();
                     y = 20;
                 }
                 doc.text(splitResponse[i], 14, y);
                 y += 3.8;
             }
-        });
+        } else {
+            doc.text(`Estado General Canal: ${service.last_run.status.toUpperCase()}`, 14, 40);
+            doc.text(`Mensaje: ${service.last_run.message || 'Sin mensaje'}`, 14, 46);
+            
+            doc.setDrawColor(220, 220, 220);
+            doc.line(14, 52, 196, 52);
+            
+            doc.setFont("helvetica", "bold");
+            doc.text("Cliente", 14, 60);
+            doc.text("Estado", 90, 60);
+            doc.text("Resumen de Transmision", 125, 60);
+            
+            doc.setFont("helvetica", "normal");
+            let y = 68;
+            
+            payloadToExport.forEach((row: any) => {
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20;
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Cliente", 14, y);
+                    doc.text("Estado", 90, y);
+                    doc.text("Resumen de Transmision", 125, y);
+                    doc.setFont("helvetica", "normal");
+                    y += 8;
+                }
+                
+                doc.text(row.client.substring(0, 35), 14, y);
+                doc.text(row.status === 'success' ? 'Correcto' : 'Error', 90, y);
+                
+                const messageText = row.message || '';
+                const splitMessage = doc.splitTextToSize(messageText, 70);
+                doc.text(splitMessage, 125, y);
+                
+                const linesCount = splitMessage.length;
+                y += Math.max(8, linesCount * 5);
+            });
+            
+            // --- FOLLOWING PAGES: Detailed Payload & SOAP Response per Client ---
+            payloadToExport.forEach((row: any) => {
+                doc.addPage();
+                y = 20;
+                
+                // Client Header
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(13);
+                doc.text(`Detalle de Trafico: ${row.client}`, 14, y);
+                y += 8;
+                
+                doc.setFontSize(9);
+                doc.text(`Fecha Ejecución: ${new Date(service.last_run!.created_at).toLocaleString('es-ES')}`, 14, y);
+                y += 5;
+                doc.text(`Estado: ${row.status.toUpperCase()}`, 14, y);
+                y += 5;
+                doc.text(`Respuesta: ${row.message || '—'}`, 14, y);
+                y += 8;
+                
+                // Draw payload
+                doc.setFontSize(9);
+                doc.setFont("helvetica", "bold");
+                doc.text("Payload Enviado (AVL GPS Positions):", 14, y);
+                y += 5;
+                doc.setFont("courier", "normal");
+                doc.setFontSize(7.5);
+                const payloadStr = safeStringify(row.transmission_payload, true) || 'Sin datos';
+                const splitPayload = doc.splitTextToSize(payloadStr, 180);
+                
+                for (let i = 0; i < splitPayload.length; i++) {
+                    if (y > 285) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text(splitPayload[i], 14, y);
+                    y += 3.8;
+                }
+                
+                // Draw response
+                y += 6;
+                if (y > 265) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9);
+                doc.text("Respuesta del Servidor (SOAP/REST Response):", 14, y);
+                y += 5;
+                doc.setFont("courier", "normal");
+                doc.setFontSize(7.5);
+                const responseStr = safeStringify(row.transmission_response, true) || 'Sin respuesta';
+                const splitResponse = doc.splitTextToSize(responseStr, 180);
+                
+                for (let i = 0; i < splitResponse.length; i++) {
+                    if (y > 285) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text(splitResponse[i], 14, y);
+                    y += 3.8;
+                }
+            });
+        }
         
-        doc.save(`interaccion_${service.name.replace(/\s+/g, '_')}.pdf`);
+        const filenameSuffix = singleClientName 
+            ? `${service.name.replace(/\s+/g, '_')}_${singleClientName.replace(/\s+/g, '_')}`
+            : `${service.name.replace(/\s+/g, '_')}`;
+        doc.save(`interaccion_${filenameSuffix}.pdf`);
     };
 
-    const toggleRow = (idx: number) => {
-        setExpandedClientIndex(expandedClientIndex === idx ? null : idx);
+    const toggleRow = (clientName: string) => {
+        setExpandedClientName(expandedClientName === clientName ? null : clientName);
     };
+
+    const filteredPayload = selectedService?.last_run?.payload?.filter((row: any) =>
+        row.client.toLowerCase().includes(clientSearchFilter.toLowerCase())
+    ) || [];
 
     return (
         <AppLayout>
@@ -423,7 +497,8 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
                                                             size="sm"
                                                             onClick={() => {
                                                                 setSelectedService(service);
-                                                                setExpandedClientIndex(null);
+                                                                setExpandedClientName(null);
+                                                                setClientSearchFilter('');
                                                             }}
                                                             className="text-orange-650 hover:text-white hover:bg-orange-500 border-orange-200 dark:border-orange-900 gap-1 text-[11px]"
                                                         >
@@ -538,10 +613,30 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
                                 
                                 {/* Table of client interactions */}
                                 <div>
-                                    <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-3 flex items-center gap-1.5">
-                                        Detalle de Clientes enlazados
-                                    </h4>
-                                    {selectedService.last_run?.payload && selectedService.last_run.payload.length > 0 ? (
+                                    <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-3">
+                                        <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 self-start">
+                                            Detalle de Clientes enlazados
+                                        </h4>
+                                        <div className="relative w-full sm:max-w-xs">
+                                            <input 
+                                                type="text"
+                                                placeholder="Filtrar por cliente..."
+                                                value={clientSearchFilter}
+                                                onChange={(e) => setClientSearchFilter(e.target.value)}
+                                                className="w-full pl-3 pr-8 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                                            />
+                                            {clientSearchFilter && (
+                                                <button 
+                                                    onClick={() => setClientSearchFilter('')}
+                                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-650 text-xs font-bold"
+                                                >
+                                                    &times;
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    {filteredPayload.length > 0 ? (
                                         <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
                                             <Table>
                                                 <TableHeader className="bg-zinc-50 dark:bg-zinc-900/30">
@@ -550,18 +645,18 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
                                                         <TableHead className="font-semibold text-xs py-2">Cliente</TableHead>
                                                         <TableHead className="font-semibold text-xs py-2 text-center">Estado</TableHead>
                                                         <TableHead className="font-semibold text-xs py-2">Respuesta/Error Resumen</TableHead>
-                                                        <TableHead className="font-semibold text-xs py-2 text-right">Tráfico Raw</TableHead>
+                                                        <TableHead className="font-semibold text-xs py-2 text-right">Acciones / Tráfico</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {selectedService.last_run.payload.map((row: any, idx: number) => {
-                                                        const isExpanded = expandedClientIndex === idx;
+                                                    {filteredPayload.map((row: any, idx: number) => {
+                                                        const isExpanded = expandedClientName === row.client;
                                                         return (
                                                             <>
                                                                 <TableRow key={idx} className="hover:bg-zinc-50/20 transition-colors">
                                                                     <TableCell className="py-3 text-center">
                                                                         <button 
-                                                                            onClick={() => toggleRow(idx)}
+                                                                            onClick={() => toggleRow(row.client)}
                                                                             className="text-zinc-400 hover:text-zinc-600"
                                                                         >
                                                                             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -572,26 +667,46 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
                                                                         {row.status === 'success' ? (
                                                                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
                                                                                 OK
-                                                                            </span>
+                                                                             </span>
                                                                         ) : (
                                                                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
                                                                                 ERROR
-                                                                            </span>
+                                                                             </span>
                                                                         )}
                                                                     </TableCell>
                                                                     <TableCell className="text-xs text-zinc-500 dark:text-zinc-400 py-3 max-w-[250px] truncate" title={row.message}>
                                                                         {row.message || '—'}
                                                                     </TableCell>
                                                                     <TableCell className="text-right py-3">
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            onClick={() => toggleRow(idx)}
-                                                                            className="h-7 w-7 text-zinc-500 hover:text-orange-500"
-                                                                            title="Ver payload y respuesta"
-                                                                        >
-                                                                            <FileJson className="h-4 w-4" />
-                                                                        </Button>
+                                                                        <div className="flex justify-end items-center gap-1">
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                onClick={() => exportToExcel(selectedService, [row], row.client)}
+                                                                                className="h-7 w-7 text-green-600 hover:text-green-850 hover:bg-green-50 dark:hover:bg-green-950/20 dark:text-green-400"
+                                                                                title="Exportar Excel de este cliente"
+                                                                            >
+                                                                                <Download className="h-3.5 w-3.5" />
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                onClick={() => exportToPdf(selectedService, [row], row.client)}
+                                                                                className="h-7 w-7 text-red-650 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                                                                title="Exportar PDF de este cliente"
+                                                                            >
+                                                                                <Download className="h-3.5 w-3.5" />
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                onClick={() => toggleRow(row.client)}
+                                                                                className="h-7 w-7 text-zinc-500 hover:text-orange-500"
+                                                                                title="Ver payload y respuesta"
+                                                                            >
+                                                                                <FileJson className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </div>
                                                                     </TableCell>
                                                                 </TableRow>
                                                                 
@@ -628,7 +743,7 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
                                         </div>
                                     ) : (
                                         <div className="text-center py-8 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg">
-                                            <p className="text-xs text-zinc-400 dark:text-zinc-500 italic">No hay detalles de clientes disponibles para esta interacción</p>
+                                            <p className="text-xs text-zinc-400 dark:text-zinc-500 italic">No hay detalles de clientes que coincidan con la búsqueda</p>
                                         </div>
                                     )}
                                 </div>
@@ -647,18 +762,18 @@ export default function Dashboard({ metrics, services, recent_logs }: DashboardP
                                     <Button 
                                         variant="outline" 
                                         size="sm"
-                                        onClick={() => exportToExcel(selectedService)}
+                                        onClick={() => exportToExcel(selectedService, filteredPayload)}
                                         className="text-xs border-green-200 text-green-700 hover:text-green-805 hover:bg-green-50 dark:border-green-900 dark:hover:bg-green-950/20 dark:text-green-400 gap-1.5"
                                     >
-                                        <Download className="h-3.5 w-3.5" /> Exportar Excel
+                                        <Download className="h-3.5 w-3.5" /> Exportar Excel {clientSearchFilter ? '(Filtrado)' : ''}
                                     </Button>
                                     <Button 
                                         variant="default" 
                                         size="sm"
-                                        onClick={() => exportToPdf(selectedService)}
+                                        onClick={() => exportToPdf(selectedService, filteredPayload)}
                                         className="text-xs bg-red-650 hover:bg-red-500 text-white gap-1.5"
                                     >
-                                        <Download className="h-3.5 w-3.5" /> Exportar PDF
+                                        <Download className="h-3.5 w-3.5" /> Exportar PDF {clientSearchFilter ? '(Filtrado)' : ''}
                                     </Button>
                                 </div>
                             </div>
