@@ -92,12 +92,32 @@ class RcController extends Controller
         //dd($payload_data);
         $date = date('Y-m-d H:i:s');
         $filename = 'recurso_confiable_' . $date . '.log';
-        $payload = json_encode($payload_data);
         $resultado = $gpsService->callMethod('GPSAssetTracking', [
             'token' => $client->token,
             'events' => $payload_data,
         ]);
         $rawResponse = $gpsService->getLastResponse();
+
+        // Check if response indicates an authentication error
+        if ($rawResponse && (str_contains($rawResponse, 'CGI:USERUNK') || str_contains($rawResponse, 'Autentificación incorrecta'))) {
+            Log::warning("Autentificación incorrecta detectada para el cliente {$client->name}. Obteniendo nuevo token...");
+            
+            // Run token change command to update the client's token
+            \Illuminate\Support\Facades\Artisan::call('app:recurso-token-change');
+            
+            // Reload client data to get the updated token
+            $client->refresh();
+            
+            Log::info("Reintentando GPSAssetTracking para el cliente {$client->name} con el nuevo token.");
+            
+            // Retry call
+            $resultado = $gpsService->callMethod('GPSAssetTracking', [
+                'token' => $client->token,
+                'events' => $payload_data,
+            ]);
+            $rawResponse = $gpsService->getLastResponse();
+        }
+
         $log_resultado_arr = [
             'payload' => $payload_data,
             'resultado' => $rawResponse ?: $resultado,
