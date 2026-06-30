@@ -191,6 +191,15 @@ return [
             'days' => env('LOG_DAILY_DAYS', 90),
         ],
 
+        'fsdelnorte' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/fsdelnorte.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
     ],
 
 ];
+

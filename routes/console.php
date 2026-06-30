@@ -32,4 +32,8 @@ Schedule::command('app:pegasus-command')
 
 Schedule::command('app:kronh-command')
     ->everyFiveMinutes();
+
+Schedule::command('app:fsdelnorte-command')
+    ->everyFiveMinutes();
+
     

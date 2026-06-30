@@ -73,5 +73,11 @@ class ServiceSeeder extends Seeder
             'base_url' => 'https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx',
             'recurrence' => true,
         ]);
+        Service::create([
+            'name' => 'MAPON_FSDELNORTE',
+            'description' => 'FSdelNorte',
+            'base_url' => 'https://gps.fsdelnorte.com/api/v1/webhooks/gps',
+            'recurrence' => true,
+        ]);
     }
 }
