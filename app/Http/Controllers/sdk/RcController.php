@@ -50,9 +50,7 @@ class RcController extends Controller
                 $clientes66319 = [
                     "Ramiro Enrique Vargas Romero",
                     "Ernesto Soto Molina - Recurso Confiable WALMART",
-                    "Ernesto Soto Molina",
-                    "Logística tres Guerreras"
-
+                    "Ernesto Soto Molina"
                 ];
                 $cname = $client->name;
                 if (in_array($client->name, $clientes66319)) {
@@ -101,15 +99,15 @@ class RcController extends Controller
         // Check if response indicates an authentication error
         if ($rawResponse && (str_contains($rawResponse, 'CGI:USERUNK') || str_contains($rawResponse, 'Autentificación incorrecta'))) {
             Log::warning("Autentificación incorrecta detectada para el cliente {$client->name}. Obteniendo nuevo token...");
-            
+
             // Run token change command to update the client's token
             \Illuminate\Support\Facades\Artisan::call('app:recurso-token-change');
-            
+
             // Reload client data to get the updated token
             $client->refresh();
-            
+
             Log::info("Reintentando GPSAssetTracking para el cliente {$client->name} con el nuevo token.");
-            
+
             // Retry call
             $resultado = $gpsService->callMethod('GPSAssetTracking', [
                 'token' => $client->token,
