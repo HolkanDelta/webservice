@@ -199,6 +199,14 @@ return [
             'days' => env('LOG_DAILY_DAYS', 90),
         ],
 
+        'Navigation' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/Navigation.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'days' => env('LOG_DAILY_DAYS', 90),
+        ],
+
     ],
 
 ];

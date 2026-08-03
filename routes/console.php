@@ -36,4 +36,8 @@ Schedule::command('app:kronh-command')
 Schedule::command('app:fsdelnorte-command')
     ->everyFiveMinutes();
 
+Schedule::command('app:navigation-command')
+    ->everyFiveMinutes();
+
+
     
