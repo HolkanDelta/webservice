@@ -84,8 +84,8 @@ class navigation extends Controller
                     'longitud' => (string) $unit->lng,
                     'velocidad' => $unit->speed ?? 0,
                     'odometro' => $unit->mileage ? (float) $unit->mileage : 0.00,
-                    'entrada1sDigital' => [true, false, false, false],
-                    'salidasDigital' => [true, false, false, false],
+                    'entradasDigital' => [true, true, true, false],
+                    'salidasDigital' => [true, true, true, false],
                 ];
 
                 $response = Http::withHeaders([
