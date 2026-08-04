@@ -69,11 +69,11 @@ class navigation extends Controller
 
             foreach ($unitsind->data->units as $unit) {
                 $imei = (string) ($unit->device?->imei ?? $unit->vin);
-                $dateEventGPS = Carbon::parse($unit->last_update)->setTimezone('America/Mexico_City');
                 $dateEventAVL = Carbon::now('America/Mexico_City');
+                $dateEventAVL->utc();
 
                 $body = [
-                    'unitID' => $imei,
+                    'unidad' => $imei,
                     'idMensaje' => 0,
                     'registro' => $dateEventAVL->format('Y-m-d\TH:i:s.u\Z'),
                     'tipomsn' => 0,
@@ -84,6 +84,8 @@ class navigation extends Controller
                     'longitud' => (string) $unit->lng,
                     'velocidad' => $unit->speed ?? 0,
                     'odometro' => $unit->mileage ? (float) $unit->mileage : 0.00,
+                    'entrada1sDigital' => [true, true, true, false],
+                    'salidasDigital' => [true, true, true, false],
                 ];
 
                 $response = Http::withHeaders([
