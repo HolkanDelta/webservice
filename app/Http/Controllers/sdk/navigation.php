@@ -76,7 +76,7 @@ class navigation extends Controller
                     'unidad' => $imei,
                     'idMensaje' => 0,
                     'registro' => $dateEventAVL->format('Y-m-d\TH:i:s.u\Z'),
-                    'tipomsn' => 0,
+                    'tipomsn' => 1,
                     'marcaGPS' => "Suntech",
                     'modeloGPS' => "ST4000",
                     'ignicion' => true,
