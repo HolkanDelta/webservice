@@ -50,7 +50,8 @@ class RcController extends Controller
                 $clientes66319 = [
                     "Ramiro Enrique Vargas Romero",
                     "Ernesto Soto Molina - Recurso Confiable WALMART",
-                    "Ernesto Soto Molina"
+                    "Ernesto Soto Molina",
+                    "Logística tres Guerreras",
                 ];
                 $cname = $client->name;
                 if (in_array($client->name, $clientes66319)) {
